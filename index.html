@@ -1,0 +1,2007 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#0b0f29" />
+  <title>Missions de Potència i Arrels · Per a l'Andreu (6è)</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Fredoka (divertida i arrodonida) i Nunito (molt llegible) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-space: #0b0f29;
+      --card-glass: rgba(23, 30, 68, 0.82);
+    }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background-color: var(--bg-space);
+      color: #f8fafc;
+      overflow-x: hidden;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      min-height: 100vh;
+      min-height: -webkit-fill-available;
+      min-height: 100svh;
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
+    }
+
+    html {
+      height: -webkit-fill-available;
+    }
+
+    h1, h2, h3, .font-display {
+      font-family: 'Fredoka', sans-serif;
+    }
+
+    /* Seguretat tàctil global per eliminar retard de 300ms i doble-tap zoom */
+    button, [role="button"], input {
+      touch-action: manipulation;
+    }
+
+    /* Tipografia fluïda per a l'expressió matemàtica principal */
+    .math-fluid-text {
+      font-size: clamp(1.45rem, 6.2vw, 3rem);
+      line-height: 1.15;
+      word-break: break-word;
+    }
+
+    /* Fons estrellat animat */
+    .starfield {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background: radial-gradient(ellipse at top, #1e1b4b 0%, #0b0f29 55%, #050714 100%);
+      overflow: hidden;
+    }
+
+    .star {
+      position: absolute;
+      background: white;
+      border-radius: 50%;
+      animation: twinkle var(--duration, 3s) infinite ease-in-out;
+      opacity: var(--opacity, 0.7);
+    }
+
+    @keyframes twinkle {
+      0%, 100% { transform: scale(1); opacity: var(--opacity, 0.7); }
+      50% { transform: scale(1.4); opacity: 0.2; }
+    }
+
+    /* Animacions de nau i elements flotants */
+    @keyframes floatShip {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-8px) rotate(2deg); }
+    }
+
+    .animate-float {
+      animation: floatShip 3.2s ease-in-out infinite;
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0.75); opacity: 0; }
+      70% { transform: scale(1.05); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .animate-pop {
+      animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    @keyframes shakeError {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-10px); }
+      40% { transform: translateX(10px); }
+      60% { transform: translateX(-7px); }
+      80% { transform: translateX(7px); }
+    }
+
+    .animate-shake {
+      animation: shakeError 0.42s ease-in-out;
+    }
+
+    @keyframes chestWobble {
+      0%, 100% { transform: rotate(0deg) scale(1); }
+      25% { transform: rotate(-6deg) scale(1.05); }
+      50% { transform: rotate(6deg) scale(1.08); }
+      75% { transform: rotate(-4deg) scale(1.04); }
+    }
+
+    .animate-chest:hover {
+      animation: chestWobble 0.6s ease-in-out infinite;
+    }
+
+    /* Botons 3D estil arcade */
+    /* Ajustos Mobile-First i Chrome/Safari iOS per evitar talls amb la barra inferior d'iOS */
+    @media (max-width: 640px) {
+      body.in-game-mode {
+        min-height: 100svh;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      body.zen-fullscreen header {
+        padding-top: 0.35rem !important;
+        padding-bottom: 0.35rem !important;
+      }
+      body.zen-fullscreen #header-title-wrap {
+        display: none;
+      }
+      .game-compact-card {
+        padding: 0.75rem !important;
+        border-radius: 1.25rem !important;
+      }
+      .option-btn {
+        min-height: 48px;
+        padding: 0.55rem 0.65rem !important;
+        font-size: 0.95rem !important;
+      }
+      .keypad-btn {
+        min-height: 42px;
+      }
+    }
+
+    /* Estil personalitzat per a barra de desplaçament */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #4f46e5;
+      border-radius: 9999px;
+    }
+
+    /* Canvas de partícules per sobre de tot però sense bloquejar clics */
+    #fx-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 60;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- Fons d'estrelles -->
+  <div id="starfield" class="starfield"></div>
+
+  <!-- Canvas de partícules (estrelles i confeti) -->
+  <canvas id="fx-canvas"></canvas>
+
+  <!-- CAPÇALERA / HUD SUPERIOR ULTRA-COMPACTA -->
+  <header class="sticky top-0 z-40 backdrop-blur-md bg-slate-950/85 border-b border-indigo-500/30 px-2.5 sm:px-6 py-2 sm:py-3">
+    <div class="max-w-5xl mx-auto flex items-center justify-between gap-1.5 sm:gap-2">
+      <!-- Logo / Tornar a l'inici -->
+      <button onclick="goHome()" class="flex items-center gap-2 text-left group focus:outline-none min-w-0 shrink">
+        <div id="header-ship-badge" class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/30 border border-indigo-300/40 group-hover:scale-105 transition shrink-0">
+          <!-- SVG Nau actual -->
+          <span id="header-ship-icon" class="text-xl sm:text-2xl">🚀</span>
+        </div>
+        <div id="header-title-wrap" class="truncate">
+          <h1 class="font-display text-sm sm:text-xl font-bold bg-gradient-to-r from-cyan-300 via-indigo-200 to-fuchsia-300 bg-clip-text text-transparent leading-tight truncate">
+            Missions de Potència i Arrels · Andreu
+          </h1>
+          <p class="hidden sm:block text-xs text-indigo-300 font-bold tracking-wide">6è de Primària · Missió Espacial de l'Andreu</p>
+        </div>
+      </button>
+
+      <!-- Indicadors de gamificació i accessos ràpids compactes -->
+      <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+        <!-- Indicador de Ratxa ràpid al HUD (visible durant partida) -->
+        <div id="hud-streak-badge" class="hidden items-center gap-1 bg-slate-900/95 border border-amber-400/40 px-2 py-1 rounded-xl text-xs font-display font-bold text-amber-300">
+          <span id="hud-streak-flame">🔥</span>
+          <span id="hud-streak-mult">x1</span>
+        </div>
+
+        <!-- Cristalls d'energia -->
+        <div class="flex items-center gap-1 bg-slate-900/95 border border-cyan-400/40 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-xl sm:rounded-2xl shadow-inner" title="Cristalls d'Energia guanyats">
+          <span class="text-sm sm:text-lg">💎</span>
+          <span id="hud-crystals" class="font-display font-bold text-cyan-300 text-sm sm:text-lg">0</span>
+        </div>
+
+        <!-- Botó Botiga / Cofres -->
+        <button onclick="openModal('shop')" class="btn-3d relative flex items-center gap-1 bg-gradient-to-r from-amber-500 to-orange-500 hover:brightness-110 text-slate-950 font-display font-bold px-2.5 py-1.5 sm:px-4 rounded-xl sm:rounded-2xl shadow-[0_3px_0_#b45309] text-xs sm:text-base" title="Cofres i Premis">
+          <span class="text-sm sm:text-base">🎁</span>
+          <span class="hidden md:inline">Cofres i Premis</span>
+          <span id="shop-notif-dot" class="hidden absolute -top-1 -right-1 w-3 h-3 bg-rose-500 border-2 border-slate-950 rounded-full animate-ping"></span>
+          <span id="shop-notif-static" class="hidden absolute -top-1 -right-1 w-3 h-3 bg-rose-500 border-2 border-slate-950 rounded-full"></span>
+        </button>
+
+        <!-- Botó Vitrina de Trofeus -->
+        <button onclick="openModal('trophy')" class="btn-3d flex items-center gap-1 bg-indigo-600 hover:bg-indigo-500 text-white font-display font-bold px-2 py-1.5 sm:px-3 rounded-xl sm:rounded-2xl shadow-[0_3px_0_#3730a3] text-xs sm:text-base" title="Vitrina de Trofeus i Hangar">
+          <span class="text-sm sm:text-base">🏆</span>
+          <span id="hud-trophies" class="text-[11px] sm:text-sm bg-indigo-900/80 px-1.5 py-0.5 rounded-md">1/12</span>
+        </button>
+
+        <!-- Botó Xuleta ràpida -->
+        <button onclick="openModal('cheatsheet')" class="btn-3d w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-cyan-900/80 hover:bg-cyan-800 border border-cyan-500/40 flex items-center justify-center text-sm sm:text-lg transition" title="Xuleta de Repàs">
+          📖
+        </button>
+
+        <!-- Botó Pantalla Sencera / Mode Focus iOS -->
+        <button id="btn-fullscreen" onclick="toggleFullscreenMode()" class="btn-3d w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-slate-800 hover:bg-slate-700 border border-cyan-500/40 flex items-center justify-center text-sm sm:text-lg transition" title="Pantalla Sencera">
+          ⛶
+        </button>
+
+        <!-- Botó de So (Silenci / Activat) -->
+        <button id="btn-mute" onclick="toggleMute()" class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-slate-800 hover:bg-slate-700 border border-slate-600/60 flex items-center justify-center text-sm sm:text-lg transition" title="Activa o silencia els efectes de so">
+          🔊
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTINGUT PRINCIPAL -->
+  <main id="main-container" class="flex-1 max-w-5xl w-full mx-auto px-3 sm:px-4 py-2.5 sm:py-8 pb-6 flex flex-col justify-center">
+    <!-- ========================================================= -->
+    <!-- PANTALLA 1: MAPA DE PLANETES / SELECCIÓ DE MISSIÓ         -->
+    <!-- ========================================================= -->
+    <section id="screen-home" class="space-y-4 sm:space-y-6 animate-pop">
+      <!-- Targeta de benvinguda i Nau Equipada -->
+      <div class="bg-slate-900/85 backdrop-blur-md border border-indigo-400/30 rounded-3xl p-4 sm:p-6 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-3.5 sm:gap-5 text-center sm:text-left flex-col sm:flex-row">
+          <div id="home-ship-visual" class="w-16 h-16 sm:w-20 sm:h-20 shrink-0 animate-float">
+            <!-- SVG de la nau equipada inserit per JS -->
+          </div>
+          <div class="space-y-1">
+            <div class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-indigo-200 text-xs font-extrabold">
+              <span>🎖️ Pilot Andreu · Rang:</span>
+              <span id="home-rank-name">Cadet Estel·lar</span>
+            </div>
+            <h2 class="font-display text-xl sm:text-3xl font-bold text-white leading-tight">
+              A punt per a l'examen, Andreu?
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-300">
+              Nau activa de l'Andreu: <strong id="home-ship-name" class="text-cyan-300">Nau Exploradora I</strong> · Repassa potències i arrels i obre cofres!
+            </p>
+          </div>
+        </div>
+
+        <button onclick="openModal('cheatsheet')" class="btn-3d w-full sm:w-auto bg-cyan-950/90 hover:bg-cyan-900 border border-cyan-400/40 text-cyan-200 font-display font-bold px-4 py-2.5 rounded-2xl text-xs sm:text-sm shrink-0">
+          📖 Repassar Xuleta
+        </button>
+      </div>
+
+      <!-- Graella de Planetes / Missions -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-5">
+        <!-- Planeta 1 -->
+        <button onclick="startMission(1)" class="btn-3d text-left bg-gradient-to-br from-indigo-950/95 to-slate-900/95 hover:from-indigo-900 hover:to-slate-900 border-2 border-cyan-400/40 rounded-3xl p-4 sm:p-6 shadow-xl flex flex-col justify-between gap-3 group">
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <span class="text-3xl sm:text-4xl group-hover:scale-110 transition">🪐</span>
+              <div>
+                <span class="text-[11px] font-extrabold uppercase tracking-wider text-cyan-300">Planeta 1 · Nivell Inicial</span>
+                <h3 class="font-display text-lg sm:text-xl font-bold text-white">El Codi de les Potències</h3>
+              </div>
+            </div>
+            <span id="badge-m1" class="text-xl sm:text-2xl">🚀</span>
+          </div>
+          <p class="text-xs sm:text-sm text-slate-300">
+            Un simulacre complet barrejant <strong>potències, base 10 i arrels</strong> per a l'Andreu amb <strong>recompensa doble</strong> de cristalls!
+          </p>
+          <div class="flex items-center justify-between pt-1 border-t border-slate-800 text-xs font-extrabold">
+            <span class="text-slate-400">10 preguntes</span>
+            <span class="text-amber-300 bg-amber-950/80 px-2.5 py-1 rounded-xl">+20 💎 / encert</span>
+          </div>
+        </button>
+
+        <!-- Planeta 5: Nebula de les Arrels -->
+        <button onclick="startMission(5)" class="btn-3d sm:col-span-2 text-left bg-gradient-to-br from-sky-950/95 via-indigo-950/95 to-slate-900/95 hover:from-sky-900 hover:to-slate-900 border-2 border-sky-400/60 rounded-3xl p-4 sm:p-6 shadow-xl flex flex-col justify-between gap-3 group">
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <span class="text-3xl sm:text-4xl group-hover:scale-110 transition">√</span>
+              <div>
+                <span class="text-[11px] font-extrabold uppercase tracking-wider text-sky-300">Planeta 5 · Arrels de 6è</span>
+                <h3 class="font-display text-lg sm:text-xl font-bold text-white">Nèbula de les Arrels (Exactes i Estimacions)</h3>
+              </div>
+            </div>
+            <span id="badge-m5" class="text-xl sm:text-2xl">🧭</span>
+          </div>
+          <p class="text-xs sm:text-sm text-slate-300">
+            Domina les <strong>arrels quadrades exactes</strong> (fins a √144), el <strong>costat d'un quadrat</strong> a partir de l'àrea i l'<strong>estimació</strong> entre dos nombres seguits!
+          </p>
+          <div class="flex items-center justify-between pt-1 border-t border-slate-800 text-xs font-extrabold">
+            <span class="text-slate-400">8 preguntes</span>
+            <span class="text-sky-300 bg-sky-950/80 px-2.5 py-1 rounded-xl">+18 💎 / encert</span>
+          </div>
+        </button>
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- PANTALLA 2: ZONA DE JOC ACTIU (OPTIMITZADA MOBILE-FIRST)  -->
+    <!-- ========================================================= -->
+    <section id="screen-game" class="hidden flex-1 flex flex-col justify-between sm:justify-center gap-2.5 sm:gap-5 max-h-full">
+      <!-- Barra superior de la missió: Progrés + Ratxa (Combo) -->
+      <div class="bg-slate-900/85 border border-indigo-500/30 rounded-2xl sm:rounded-3xl px-3 py-2 sm:p-4 shadow-lg shrink-0">
+        <div class="flex items-center justify-between gap-2 mb-1.5 sm:mb-2.5">
+          <div class="flex items-center gap-1.5 sm:gap-2 min-w-0">
+            <button onclick="confirmExitMission()" class="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold border border-slate-600/50 transition shrink-0">
+              ← Mapa
+            </button>
+            <span id="game-mission-title" class="font-display font-bold text-cyan-300 text-xs sm:text-base truncate">
+              Planeta 1
+            </span>
+          </div>
+
+          <!-- Indicador de Ratxa / Combo -->
+          <div id="combo-pill" class="flex items-center gap-1.5 px-2.5 py-0.5 sm:px-3.5 sm:py-1 rounded-full bg-slate-800 border border-slate-600 transition-all duration-300 shrink-0">
+            <span id="combo-flame" class="text-sm sm:text-base">🔥</span>
+            <span id="combo-text" class="font-display font-bold text-[11px] sm:text-sm text-slate-200">Ratxa: 0 (x1)</span>
+          </div>
+
+          <div class="text-xs sm:text-sm font-extrabold text-slate-300 shrink-0">
+            <span id="game-q-current" class="text-white">1</span>/<span id="game-q-total">8</span>
+          </div>
+        </div>
+
+        <!-- Barra de progrés visual -->
+        <div class="relative w-full h-2.5 sm:h-3.5 bg-slate-950 rounded-full overflow-hidden border border-slate-700/80">
+          <div id="game-progress-bar" class="h-full bg-gradient-to-r from-cyan-400 via-indigo-500 to-fuchsia-500 rounded-full transition-all duration-500" style="width: 10%;"></div>
+        </div>
+      </div>
+
+      <!-- Targeta principal de la pregunta -->
+      <div id="question-card" class="game-compact-card flex-1 sm:flex-initial flex flex-col justify-between bg-slate-900/90 backdrop-blur-md border-2 border-indigo-400/30 rounded-3xl p-4 sm:p-8 shadow-2xl gap-2.5 sm:gap-6 relative overflow-hidden">
+        <!-- Etiqueta del tipus de pregunta -->
+        <div class="flex items-center justify-between gap-2 shrink-0">
+          <span id="q-category-tag" class="inline-block px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-xl bg-indigo-500/20 border border-indigo-400/30 text-indigo-200 font-bold text-[11px] sm:text-xs uppercase tracking-wider truncate">
+            Concepte Bàsic
+          </span>
+          <span id="q-reward-tag" class="text-xs font-extrabold text-cyan-300 bg-cyan-950/80 border border-cyan-500/30 px-2.5 py-0.5 sm:py-1 rounded-xl shrink-0">
+            +10 💎
+          </span>
+        </div>
+
+        <!-- Enunciat i expressió matemàtica destacada -->
+        <div class="text-center space-y-1.5 sm:space-y-3 my-auto">
+          <h3 id="q-prompt" class="font-display text-base sm:text-2xl font-bold text-white leading-snug px-1">
+            Carregant pregunta...
+          </h3>
+          <div id="q-math-box" class="inline-block max-w-full bg-slate-950/90 border-2 border-indigo-500/40 rounded-2xl px-4 py-2.5 sm:px-6 sm:py-4 shadow-inner">
+            <span id="q-math-display" class="font-display math-fluid-text font-bold text-amber-300 tracking-wide block">
+              4 × 4 × 4
+            </span>
+          </div>
+          <p id="q-hint" class="text-[11px] sm:text-sm text-slate-400 italic hidden"></p>
+        </div>
+
+        <!-- ÀREA DE RESPOSTA: Mode Selecció Múltiple (2x2 compacte en mòbil, 2 columnes en PC) -->
+        <div id="answer-options-grid" class="grid grid-cols-2 gap-2 sm:gap-3.5 pt-1 shrink-0">
+          <!-- Botons generats dinàmicament -->
+        </div>
+
+        <!-- ÀREA DE RESPOSTA: Mode Introducció Numèrica amb Teclat Espacial Integrat -->
+        <div id="answer-numeric-box" class="hidden w-full max-w-md mx-auto space-y-2 sm:space-y-3 pt-0.5 shrink-0">
+          <div class="flex items-center gap-2">
+            <input
+              id="numeric-input"
+              type="text"
+              inputmode="none"
+              autocomplete="off"
+              placeholder="Resposta..."
+              class="w-full text-center font-display text-xl sm:text-3xl font-bold bg-slate-950 border-2 border-cyan-400/60 focus:border-cyan-300 focus:outline-none rounded-2xl py-2.5 sm:py-3.5 px-3 text-white placeholder-slate-600 shadow-inner"
+            />
+            <button
+              id="btn-submit-numeric"
+              onclick="submitNumericAnswer()"
+              class="btn-3d bg-gradient-to-r from-emerald-500 to-teal-500 hover:brightness-110 text-slate-950 font-display font-bold text-base sm:text-lg px-4 sm:px-6 py-3 sm:py-4 rounded-2xl shadow-[0_4px_0_#0f766e] shrink-0"
+            >
+              ✓ OK
+            </button>
+          </div>
+
+          <!-- Teclat Numèric Espacial Ergonomic (sempre visible en mode numèric per evitar teclat natiu mòbil) -->
+          <div id="spatial-keypad" class="grid grid-cols-6 gap-1.5 sm:gap-2 bg-slate-950/75 p-2 rounded-2xl border border-indigo-500/25">
+            <button type="button" onclick="appendDigit('1')" class="keypad-btn btn-3d bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white rounded-xl font-display font-bold text-lg sm:text-xl shadow-[0_2px_0_#0f172a]">1</button>
+            <button type="button" onclick="appendDigit('2')" class="keypad-btn btn-3d bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white rounded-xl font-display font-bold text-lg sm:text-xl shadow-[0_2px_0_#0f172a]">2</button>
+            <button type="button" onclick="appendDigit('3')" class="keypad-btn btn-3d bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white rounded-xl font-display font-bold text-lg sm:text-xl shadow-[0_2px_0_#0f172a]">3</button>
+            <button type="button" onclick="appendDigit('4')" class="keypad-btn btn-3d bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white rounded-xl font-display font-bold text-lg sm:text-xl shadow-[0_2px_0_#0f172a]">4</button>
+            <button type="button" onclick="appendDigit('5')" class="keypad-btn btn-3d bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white rounded-xl font-display font-bold text-lg sm:text-xl shadow-[0_2px_0_#0f172a]">5</button>
+            <button type="button" onclick="backspaceDigit()" class="keypad-btn btn-3d bg-rose-900/80 hover:bg-rose-800 active:bg-rose-600 text-rose-100 rounded-xl font-display font-bold text-lg sm:text-xl shadow-[0_2px_0_#4c0519]" aria-label="Esborrar">⌫</button>
+            <button type="button" onclick="appendDigit('6')" class="keypad-btn btn-3d bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white rounded-xl font-display font-bold text-lg sm:text-xl shadow-[0_2px_0_#0f172a]">6</button>
+            <button type="button" onclick="appendDigit('7')" class="keypad-btn btn-3d bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white rounded-xl font-display font-bold text-lg sm:text-xl shadow-[0_2px_0_#0f172a]">7</button>
+            <button type="button" onclick="appendDigit('8')" class="keypad-btn btn-3d bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white rounded-xl font-display font-bold text-lg sm:text-xl shadow-[0_2px_0_#0f172a]">8</button>
+            <button type="button" onclick="appendDigit('9')" class="keypad-btn btn-3d bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white rounded-xl font-display font-bold text-lg sm:text-xl shadow-[0_2px_0_#0f172a]">9</button>
+            <button type="button" onclick="appendDigit('0')" class="keypad-btn btn-3d bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white rounded-xl font-display font-bold text-lg sm:text-xl shadow-[0_2px_0_#0f172a]">0</button>
+            <button type="button" onclick="clearDigits()" class="keypad-btn btn-3d bg-slate-700 hover:bg-slate-600 active:bg-slate-500 text-slate-200 rounded-xl font-display font-bold text-sm sm:text-base shadow-[0_2px_0_#0f172a]">C</button>
+          </div>
+        </div>
+
+        <!-- PANELL DE FEEDBACK IMMEDIAT (Compacte i ben visible en mòbil) -->
+        <div id="feedback-banner" class="hidden rounded-2xl p-3 sm:p-5 border-2 transition-all animate-pop shrink-0">
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-4">
+            <div class="flex items-start gap-2.5">
+              <span id="feedback-icon" class="text-2xl sm:text-3xl shrink-0">🎉</span>
+              <div class="min-w-0">
+                <h4 id="feedback-title" class="font-display font-bold text-base sm:text-lg leading-tight">Fantàstic!</h4>
+                <p id="feedback-explanation" class="text-xs sm:text-sm text-slate-200 mt-0.5 leading-snug">
+                  Explicació detallada aquí.
+                </p>
+              </div>
+            </div>
+            <button id="btn-next-question" onclick="nextQuestion()" class="btn-3d w-full sm:w-auto bg-white text-slate-950 hover:bg-cyan-100 font-display font-bold py-2.5 sm:py-3 px-5 rounded-xl sm:rounded-2xl shadow-[0_3px_0_#94a3b8] shrink-0 text-sm sm:text-base">
+              Següent →
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- PANTALLA 3: RESUM DE MISSIÓ I REPÀS D'ERRORS              -->
+    <!-- ========================================================= -->
+    <section id="screen-summary" class="hidden space-y-4 sm:space-y-6 animate-pop">
+      <div class="bg-slate-900/90 backdrop-blur-md border-2 border-indigo-400/40 rounded-3xl p-5 sm:p-8 shadow-2xl text-center space-y-4 sm:space-y-5">
+        <div id="summary-trophy-icon" class="text-5xl sm:text-6xl animate-float">🏆</div>
+        <div class="space-y-1">
+          <h2 id="summary-heading" class="font-display text-2xl sm:text-3xl font-bold text-white">Missió Completada!</h2>
+          <p id="summary-subtext" class="text-xs sm:text-base text-slate-300 max-w-xl mx-auto">
+            Has completat l'entrenament galàctic.
+          </p>
+        </div>
+
+        <!-- Estadístiques de la partida -->
+        <div class="grid grid-cols-3 gap-2.5 sm:gap-4 max-w-lg mx-auto">
+          <div class="bg-slate-950/90 border border-slate-800 rounded-2xl p-3">
+            <p class="text-[11px] sm:text-xs font-bold text-slate-400">Encerts</p>
+            <p id="stat-score" class="font-display text-lg sm:text-2xl font-bold text-emerald-400">8/8</p>
+          </div>
+          <div class="bg-slate-950/90 border border-slate-800 rounded-2xl p-3">
+            <p class="text-[11px] sm:text-xs font-bold text-slate-400">Millor Ratxa</p>
+            <p id="stat-streak" class="font-display text-lg sm:text-2xl font-bold text-amber-400">5 🔥</p>
+          </div>
+          <div class="bg-slate-950/90 border border-slate-800 rounded-2xl p-3">
+            <p class="text-[11px] sm:text-xs font-bold text-slate-400">Guanyats</p>
+            <p id="stat-crystals" class="font-display text-lg sm:text-2xl font-bold text-cyan-300">+120 💎</p>
+          </div>
+        </div>
+
+        <!-- Crida per obrir cofre si té prou cristalls -->
+        <div id="summary-chest-callout" class="hidden bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-400/50 rounded-2xl p-3.5 max-w-lg mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+          <p class="text-xs sm:text-sm font-bold text-amber-200">🎁 Tens prou cristalls per obrir un Cofre Sorpresa!</p>
+          <button onclick="openModal('shop')" class="btn-3d w-full sm:w-auto bg-amber-400 text-slate-950 font-display font-bold px-4 py-2 rounded-xl text-xs sm:text-sm shrink-0">
+            Anar als Cofres
+          </button>
+        </div>
+
+        <!-- Banner de partida perfecta -->
+        <div id="perfect-banner" class="hidden bg-emerald-950/70 border border-emerald-400/40 rounded-2xl p-4 max-w-lg mx-auto">
+          <p class="font-display font-bold text-emerald-300 text-sm sm:text-base">🌟 Cap error! Has fet una missió impecable!</p>
+        </div>
+
+        <!-- Quadern d'Errors -->
+        <div id="mistakes-review-container" class="hidden text-left max-w-2xl mx-auto space-y-2.5 pt-2">
+          <h3 class="font-display text-base sm:text-lg font-bold text-rose-300 flex items-center gap-2">
+            <span>📓</span> Quadern de Repàs (Per no fallar a l'examen!)
+          </h3>
+          <div id="mistakes-list" class="space-y-2.5 max-h-64 overflow-y-auto pr-1">
+            <!-- Errors inserits per JS -->
+          </div>
+        </div>
+
+        <!-- Botons d'acció finals -->
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+          <button onclick="retryCurrentMission()" class="btn-3d w-full sm:w-auto bg-indigo-600 hover:bg-indigo-500 text-white font-display font-bold px-6 py-3 rounded-2xl shadow-[0_4px_0_#3730a3]">
+            🔄 Tornar a practicar aquest planeta
+          </button>
+          <button onclick="goHome()" class="btn-3d w-full sm:w-auto bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-display font-bold px-6 py-3 rounded-2xl shadow-[0_4px_0_#0e7490]">
+            🗺️ Tornar al Mapa de Planetes
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================================================= -->
+  <!-- MODALS (BOTTOM-SHEET EN MÒBIL / CENTRATS EN ESCRIPTORI)    -->
+  <!-- ========================================================= -->
+  <div id="modal-backdrop" onclick="handleBackdropClick(event)" class="hidden fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+
+    <!-- MODAL 1: BOTIGA I COFRES DE PREMIS -->
+    <div id="modal-shop" class="hidden bg-slate-900 border-t-2 sm:border-2 border-amber-400/50 rounded-t-3xl sm:rounded-3xl w-full sm:w-[94vw] max-w-2xl p-4 sm:p-7 shadow-2xl space-y-4 sm:space-y-5 animate-pop max-h-[88dvh] overflow-y-auto pb-[calc(1rem+env(safe-area-inset-bottom))]">
+      <!-- Indicador d'arrossegament mòbil -->
+      <div class="w-12 h-1.5 bg-slate-700 rounded-full mx-auto sm:hidden"></div>
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div class="flex items-center gap-2.5">
+          <span class="text-2xl sm:text-3xl">🎁</span>
+          <div>
+            <h3 class="font-display text-lg sm:text-2xl font-bold text-amber-300">Cofres i Premis Galàctics</h3>
+            <p class="text-xs text-slate-400">Bescanvia cristalls 💎 per recompenses col·leccionables</p>
+          </div>
+        </div>
+        <button onclick="closeAllModals()" class="w-10 h-10 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-lg shrink-0">✕</button>
+      </div>
+
+      <!-- Saldo actual -->
+      <div class="flex items-center justify-between bg-slate-950/90 border border-cyan-500/30 rounded-2xl px-4 py-3">
+        <span class="text-sm font-bold text-slate-300">Els teus Cristalls d'Energia:</span>
+        <span class="font-display text-2xl font-bold text-cyan-300"><span id="modal-crystals-count">0</span> 💎</span>
+      </div>
+
+      <!-- Caixa d'animació d'obertura de cofre -->
+      <div id="chest-opening-stage" class="hidden bg-gradient-to-b from-indigo-950 to-slate-950 border-2 border-amber-400/60 rounded-3xl p-6 text-center space-y-3 animate-pop">
+        <p class="text-xs font-extrabold uppercase tracking-widest text-amber-300">Has desbloquejat un premi nou!</p>
+        <div id="unlocked-reward-visual" class="text-6xl mx-auto animate-float">🏅</div>
+        <h4 id="unlocked-reward-title" class="font-display text-2xl font-bold text-white">Nom del Premi</h4>
+        <p id="unlocked-reward-desc" class="text-sm text-slate-300 max-w-md mx-auto">Descripció del premi</p>
+        <span id="unlocked-reward-type" class="inline-block px-3 py-1 rounded-full bg-amber-400/20 text-amber-200 text-xs font-bold">Insígnia</span>
+      </div>
+
+      <!-- Opcions de Cofres -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <!-- Cofre Estel·lar -->
+        <div class="bg-gradient-to-b from-indigo-950/90 to-slate-950 border-2 border-indigo-400/40 rounded-3xl p-5 text-center flex flex-col justify-between space-y-4">
+          <div class="space-y-2">
+            <div class="text-5xl animate-chest inline-block cursor-pointer" onclick="buyChest('standard')">🧰</div>
+            <h4 class="font-display text-xl font-bold text-cyan-300">Cofre Estel·lar</h4>
+            <p class="text-xs text-slate-300">
+              Conté una <strong>Insígnia d'Honor</strong> o un <strong>Cromo Galàctic</strong> de matemàtiques!
+            </p>
+          </div>
+          <button id="btn-buy-standard" onclick="buyChest('standard')" class="btn-3d w-full bg-gradient-to-r from-cyan-400 to-indigo-500 text-slate-950 font-display font-bold py-3 rounded-2xl shadow-[0_4px_0_#1e3a8a]">
+            Obrir per 50 💎
+          </button>
+        </div>
+
+        <!-- Cofre Supernova -->
+        <div class="bg-gradient-to-b from-amber-950/70 to-slate-950 border-2 border-amber-400/50 rounded-3xl p-5 text-center flex flex-col justify-between space-y-4">
+          <div class="space-y-2">
+            <div class="text-5xl animate-chest inline-block cursor-pointer" onclick="buyChest('supernova')">👑</div>
+            <h4 class="font-display text-xl font-bold text-amber-300">Cofre Supernova</h4>
+            <p class="text-xs text-slate-300">
+              Garanteix una <strong>Nau Espacial Personalitzable</strong> o un <strong>Cromo Llegendari</strong>!
+            </p>
+          </div>
+          <button id="btn-buy-supernova" onclick="buyChest('supernova')" class="btn-3d w-full bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-display font-bold py-3 rounded-2xl shadow-[0_4px_0_#9a3412]">
+            Obrir per 100 💎
+          </button>
+        </div>
+      </div>
+
+      <p id="shop-status-msg" class="text-center text-xs font-bold text-slate-400">
+        Guanya més cristalls completant missions i encadenant ratxes!
+      </p>
+    </div>
+
+    <!-- MODAL 2: VITRINA DE TROFEUS, CROMOS I NAUS -->
+    <div id="modal-trophy" class="hidden bg-slate-900 border-t-2 sm:border-2 border-indigo-400/50 rounded-t-3xl sm:rounded-3xl w-full sm:w-[94vw] max-w-3xl p-4 sm:p-7 shadow-2xl space-y-4 sm:space-y-5 animate-pop max-h-[88dvh] overflow-y-auto pb-[calc(1rem+env(safe-area-inset-bottom))]">
+      <div class="w-12 h-1.5 bg-slate-700 rounded-full mx-auto sm:hidden"></div>
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div class="flex items-center gap-2.5">
+          <span class="text-2xl sm:text-3xl">🏆</span>
+          <div>
+            <h3 class="font-display text-lg sm:text-2xl font-bold text-white">Vitrina de Trofeus i Hangar</h3>
+            <p class="text-xs text-slate-400">Tria la teva nau i admira els cromos desbloquejats</p>
+          </div>
+        </div>
+        <button onclick="closeAllModals()" class="w-10 h-10 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-lg shrink-0">✕</button>
+      </div>
+
+      <!-- Secció Hangar de Naus -->
+      <div class="space-y-2.5">
+        <h4 class="font-display text-lg font-bold text-cyan-300 flex items-center gap-2">
+          <span>🚀</span> Hangar de Naus (Fes clic per equipar)
+        </h4>
+        <div id="hangar-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <!-- Naus generades dinàmicament -->
+        </div>
+      </div>
+
+      <!-- Secció Insígnies i Cromos -->
+      <div class="space-y-2.5 pt-2">
+        <h4 class="font-display text-lg font-bold text-amber-300 flex items-center gap-2">
+          <span>🃏</span> Àlbum de Cromos i Insígnies
+        </h4>
+        <div id="collection-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <!-- Cromos generats dinàmicament -->
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL 3: CHULETA VISUAL DE REPÀS -->
+    <div id="modal-cheatsheet" class="hidden bg-slate-900 border-t-2 sm:border-2 border-cyan-400/50 rounded-t-3xl sm:rounded-3xl w-full sm:w-[94vw] max-w-2xl p-4 sm:p-7 shadow-2xl space-y-4 animate-pop max-h-[88dvh] overflow-y-auto pb-[calc(1rem+env(safe-area-inset-bottom))]">
+      <div class="w-12 h-1.5 bg-slate-700 rounded-full mx-auto sm:hidden"></div>
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">📖</span>
+          <h3 class="font-display text-lg sm:text-2xl font-bold text-cyan-300">Guia Ràpida de les Potències (6è)</h3>
+        </div>
+        <button onclick="closeAllModals()" class="w-10 h-10 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-lg shrink-0">✕</button>
+      </div>
+
+      <div class="space-y-3 text-sm text-slate-200">
+        <div class="bg-slate-950/80 border border-indigo-500/30 rounded-2xl p-4">
+          <h4 class="font-display font-bold text-amber-300 text-base mb-1">1. Què és una potència?</h4>
+          <p>És una forma abreujada d'escriure una multiplicació de factors iguals:</p>
+          <p class="font-mono text-base text-cyan-300 mt-1">5 × 5 × 5 = 5³ = 125</p>
+          <ul class="list-disc list-inside text-xs text-slate-300 mt-1 space-y-0.5">
+            <li><strong>Base (5):</strong> El factor que es repeteix.</li>
+            <li><strong>Exponent (3):</strong> Les vegades que es multiplica la base per si mateixa.</li>
+          </ul>
+        </div>
+
+        <div class="bg-slate-950/80 border border-fuchsia-500/30 rounded-2xl p-4">
+          <h4 class="font-display font-bold text-fuchsia-300 text-base mb-1">2. Quadrats, Cubs i Casos Especials</h4>
+          <ul class="list-disc list-inside text-xs sm:text-sm text-slate-300 space-y-1">
+            <li><strong>Al quadrat (exponent 2):</strong> Ex: 6² = 6 × 6 = 36.</li>
+            <li><strong>Al cub (exponent 3):</strong> Ex: 4³ = 4 × 4 × 4 = 64.</li>
+            <li><strong>Exponent 1:</strong> Qualsevol nombre elevat a 1 és el mateix nombre (Ex: <strong>9¹ = 9</strong>).</li>
+            <li><strong>Exponent 0:</strong> Qualsevol nombre (diferent de 0) elevat a 0 sempre dona <strong>1</strong> (Ex: <strong>7⁰ = 1</strong>).</li>
+          </ul>
+        </div>
+
+        <div class="bg-slate-950/80 border border-emerald-500/30 rounded-2xl p-4">
+          <h4 class="font-display font-bold text-emerald-300 text-base mb-1">3. Potències de Base 10</h4>
+          <p class="text-xs sm:text-sm text-slate-300">
+            Una potència de base 10 és igual a un <strong>1 seguit de tants zeros com indica l'exponent</strong>:
+          </p>
+          <p class="font-mono text-xs sm:text-sm text-emerald-300 mt-1">10² = 100 · 10³ = 1.000 · 10⁴ = 10.000</p>
+          <p class="text-xs text-slate-300 mt-1">
+            <strong>Descomposició polinòmica:</strong> 3.400 = 3 × 1.000 + 4 × 100 = <strong>3 × 10³ + 4 × 10²</strong>
+          </p>
+        </div>
+
+        <div class="bg-slate-950/80 border border-sky-500/30 rounded-2xl p-4">
+          <h4 class="font-display font-bold text-sky-300 text-base mb-1">4. Les Arrels Quadrades (6è)</h4>
+          <p class="text-xs sm:text-sm text-slate-300">
+            Calcular <strong>√49</strong> és buscar quin nombre multiplicat per si mateix dona <strong>49</strong>:
+          </p>
+          <p class="font-mono text-xs sm:text-sm text-sky-300 mt-1">√49 = 7 perquè 7² = 7 × 7 = 49</p>
+          <p class="text-xs text-slate-300 mt-1">
+            <strong>Estimació:</strong> √20 està entre <strong>4</strong> (4² = 16) i <strong>5</strong> (5² = 25), perquè 16 &lt; 20 &lt; 25.
+          </p>
+        </div>
+      </div>
+
+      <div class="text-right">
+        <button onclick="closeAllModals()" class="btn-3d bg-cyan-400 text-slate-950 font-display font-bold px-5 py-2.5 rounded-xl shadow-[0_3px_0_#0e7490]">
+          Entès, a jugar, Andreu!
+        </button>
+      </div>
+    </div>
+
+    <!-- MODAL 4: CONFIRMACIÓ DE SORTIDA DE MISSIÓ -->
+    <div id="modal-exit-confirm" class="hidden bg-slate-900 border-2 border-rose-400/50 rounded-3xl w-[92vw] max-w-md p-6 text-center shadow-2xl space-y-4 animate-pop mb-4 sm:mb-0">
+      <div class="text-4xl">🛸</div>
+      <h3 class="font-display text-xl font-bold text-white">Vols abandonar la missió actual?</h3>
+      <p class="text-sm text-slate-300">Conservaràs els cristalls que ja has guanyat, però reiniciaràs el progrés d'aquest planeta.</p>
+      <div class="flex items-center justify-center gap-3 pt-2">
+        <button onclick="closeAllModals()" class="btn-3d bg-slate-700 hover:bg-slate-600 text-white font-display font-bold px-5 py-2.5 rounded-xl shadow-[0_3px_0_#334155]">
+          Continuar jugant
+        </button>
+        <button onclick="closeAllModals(); goHome();" class="btn-3d bg-rose-500 hover:bg-rose-400 text-white font-display font-bold px-5 py-2.5 rounded-xl shadow-[0_3px_0_#9f1239]">
+          Sí, tornar al mapa
+        </button>
+      </div>
+    </div>
+
+    <!-- MODAL 5: CONSELL PANTALLA SENCERA A IPHONE -->
+    <div id="modal-ios-fullscreen" class="hidden bg-slate-900 border-t-2 sm:border-2 border-cyan-400/50 rounded-t-3xl sm:rounded-3xl w-full sm:w-[92vw] max-w-md p-5 sm:p-6 shadow-2xl space-y-4 animate-pop pb-[calc(1.25rem+env(safe-area-inset-bottom))]">
+      <div class="w-12 h-1.5 bg-slate-700 rounded-full mx-auto sm:hidden"></div>
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">📱</span>
+          <h3 class="font-display text-lg sm:text-xl font-bold text-cyan-300">Mode Focus Activat!</h3>
+        </div>
+        <button onclick="closeAllModals()" class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold">✕</button>
+      </div>
+      <div class="space-y-2.5 text-xs sm:text-sm text-slate-200">
+        <p>Hem compactat la barra superior perquè guanyis més espai de joc.</p>
+        <div class="bg-slate-950/90 border border-indigo-500/30 rounded-2xl p-3.5 space-y-1.5">
+          <p class="font-bold text-amber-300">💡 Truc per a Chrome a l'iPhone (100% Pantalla Sencera):</p>
+          <p class="text-slate-300 leading-relaxed">
+            Apple no permet que les webs amaguin la barra d'adreces d'iOS automàticament, però pots tenir-la <strong>sense barres com una App</strong>:
+          </p>
+          <ol class="list-decimal list-inside text-slate-300 space-y-1 pt-1">
+            <li>Prem la icona de <strong>Compartir</strong> (quadrat amb fletxa amunt) a dalt a la dreta de Chrome.</li>
+            <li>Tria <strong>"Afegeix a la pantalla d'inici"</strong>.</li>
+            <li>Obre la icona nova des del menú de l'iPhone!</li>
+          </ol>
+        </div>
+      </div>
+      <button onclick="closeAllModals()" class="btn-3d w-full bg-cyan-400 text-slate-950 font-display font-bold py-2.5 rounded-xl shadow-[0_3px_0_#0e7490]">
+        D'acord, som-hi!
+      </button>
+    </div>
+
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- LÒGICA DEL JOC, GENERADOR DE PREGUNTES I WEB AUDIO API    -->
+  <!-- ========================================================= -->
+  <script>
+    /*************************************************************************
+     * 1. MOTOR D'ÀUDIO SINTETITZAT (WEB AUDIO API) - SENSE FITXERS EXTERNS
+     *************************************************************************/
+    const SoundFX = {
+      ctx: null,
+      muted: false,
+
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (AudioContext) {
+            this.ctx = new AudioContext();
+          }
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      },
+
+      playTone(freq, type = 'sine', duration = 0.18, volume = 0.14, delay = 0) {
+        if (this.muted) return;
+        this.init();
+        if (!this.ctx) return;
+
+        const now = this.ctx.currentTime + delay;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, now);
+
+        gain.gain.setValueAtTime(0.001, now);
+        gain.gain.exponentialRampToValueAtTime(volume, now + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + duration + 0.03);
+      },
+
+      click() {
+        this.playTone(520, 'triangle', 0.08, 0.08, 0);
+      },
+
+      correct(streak = 1) {
+        // Acord ascendent alegre; puja de to amb la ratxa
+        const boost = Math.min(streak * 25, 180);
+        this.playTone(523.25 + boost, 'sine', 0.16, 0.15, 0);
+        this.playTone(659.25 + boost, 'sine', 0.18, 0.15, 0.08);
+        this.playTone(783.99 + boost, 'triangle', 0.25, 0.16, 0.16);
+      },
+
+      wrong() {
+        // To suau descendent (no estrident)
+        this.playTone(260, 'triangle', 0.22, 0.14, 0);
+        this.playTone(195, 'sine', 0.30, 0.14, 0.14);
+      },
+
+      levelUp() {
+        // Fanfàrria de missió completada
+        const notes = [523.25, 659.25, 783.99, 1046.5];
+        notes.forEach((n, idx) => {
+          this.playTone(n, 'triangle', 0.26, 0.16, idx * 0.11);
+        });
+      },
+
+      chestOpen() {
+        // Arpegi màgic d'obertura de cofre
+        const notes = [440, 554.37, 659.25, 880, 1108.73, 1318.51];
+        notes.forEach((n, idx) => {
+          this.playTone(n, 'sine', 0.28, 0.15, idx * 0.07);
+        });
+      }
+    };
+
+    function toggleMute() {
+      SoundFX.muted = !SoundFX.muted;
+      const btn = document.getElementById('btn-mute');
+      btn.textContent = SoundFX.muted ? '🔇' : '🔊';
+      if (!SoundFX.muted) SoundFX.click();
+    }
+
+    function toggleFullscreenMode() {
+      SoundFX.click();
+      const docEl = document.documentElement;
+      const requestFs = docEl.requestFullscreen || docEl.webkitRequestFullscreen;
+      const exitFs = document.exitFullscreen || document.webkitExitFullscreen;
+      const isNativeFs = document.fullscreenElement || document.webkitFullscreenElement;
+
+      if (requestFs) {
+        if (!isNativeFs) {
+          requestFs.call(docEl).catch(() => enableIosZenMode());
+        } else if (exitFs) {
+          exitFs.call(document);
+        }
+      } else {
+        // Fallback per a iPhone (Safari i Chrome en iOS no suporten Fullscreen API en divs)
+        enableIosZenMode();
+      }
+    }
+
+    function enableIosZenMode() {
+      const isZen = document.body.classList.toggle('zen-fullscreen');
+      const btn = document.getElementById('btn-fullscreen');
+      btn.classList.toggle('bg-cyan-500', isZen);
+      btn.classList.toggle('text-slate-950', isZen);
+      if (isZen) {
+        window.scrollTo(0, 1);
+        openModal('ios-fullscreen');
+      }
+    }
+
+    /*************************************************************************
+     * 2. MOTOR DE PARTÍCULES (CONFETI I ESTRELLES EN ENCERTS I COFRES)
+     *************************************************************************/
+    const fxCanvas = document.getElementById('fx-canvas');
+    const fxCtx = fxCanvas.getContext('2d');
+    const particles = [];
+
+    function resizeFxCanvas() {
+      fxCanvas.width = window.innerWidth;
+      fxCanvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeFxCanvas);
+    resizeFxCanvas();
+
+    function spawnBurst(x, y, count = 28) {
+      const colors = ['#38bdf8', '#facc15', '#f472b6', '#34d399', '#a78bfa', '#fb923c'];
+      for (let i = 0; i < count; i++) {
+        const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.4;
+        const speed = 2.5 + Math.random() * 6.5;
+        particles.push({
+          x,
+          y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed - 2,
+          size: 4 + Math.random() * 6,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          alpha: 1,
+          gravity: 0.16,
+          rotation: Math.random() * Math.PI * 2,
+          shape: Math.random() > 0.45 ? 'star' : 'circle'
+        });
+      }
+    }
+
+    function updateParticles() {
+      fxCtx.clearRect(0, 0, fxCanvas.width, fxCanvas.height);
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += p.gravity;
+        p.alpha -= 0.018;
+        p.rotation += 0.08;
+
+        if (p.alpha <= 0) {
+          particles.splice(i, 1);
+          continue;
+        }
+
+        fxCtx.save();
+        fxCtx.globalAlpha = p.alpha;
+        fxCtx.fillStyle = p.color;
+        fxCtx.translate(p.x, p.y);
+        fxCtx.rotate(p.rotation);
+
+        if (p.shape === 'star') {
+          fxCtx.beginPath();
+          for (let s = 0; s < 5; s++) {
+            fxCtx.lineTo(Math.cos(((18 + s * 72) * Math.PI) / 180) * p.size,
+                         -Math.sin(((18 + s * 72) * Math.PI) / 180) * p.size);
+            fxCtx.lineTo(Math.cos(((54 + s * 72) * Math.PI) / 180) * (p.size * 0.45),
+                         -Math.sin(((54 + s * 72) * Math.PI) / 180) * (p.size * 0.45));
+          }
+          fxCtx.closePath();
+          fxCtx.fill();
+        } else {
+          fxCtx.beginPath();
+          fxCtx.arc(0, 0, p.size * 0.6, 0, Math.PI * 2);
+          fxCtx.fill();
+        }
+        fxCtx.restore();
+      }
+      requestAnimationFrame(updateParticles);
+    }
+
+    /*************************************************************************
+     * 3. CATÀLEG DE RECOMPENSES (NAUS, INSÍGNIES I CROMOS)
+     *************************************************************************/
+    const SHIPS = [
+      {
+        id: 'ship_starter',
+        name: 'Nau Exploradora I',
+        emoji: '🚀',
+        desc: 'La teva nau inicial de l\'Acadèmia Galàctica.',
+        unlocked: true,
+        svg: `<svg viewBox="0 0 100 100" class="w-full h-full"><defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#38bdf8"/><stop offset="100%" stop-color="#6366f1"/></linearGradient></defs><path d="M50 10 C68 32 72 58 68 75 L32 75 C28 58 32 32 50 10 Z" fill="url(#g1)"/><path d="M32 58 L16 76 L32 73 Z" fill="#f43f5e"/><path d="M68 58 L84 76 L68 73 Z" fill="#f43f5e"/><circle cx="50" cy="44" r="11" fill="#e0f2fe" stroke="#0284c7" stroke-width="3"/><path d="M40 75 L50 93 L60 75 Z" fill="#fbbf24"/></svg>`
+      },
+      {
+        id: 'ship_comet',
+        name: 'Cometa Daurat',
+        emoji: '🛸',
+        desc: 'Propulsada per l\'energia dels quadrats perfectes.',
+        unlocked: false,
+        svg: `<svg viewBox="0 0 100 100" class="w-full h-full"><defs><linearGradient id="g2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#fde047"/><stop offset="100%" stop-color="#f97316"/></linearGradient></defs><ellipse cx="50" cy="56" rx="38" ry="16" fill="url(#g2)"/><path d="M30 50 C30 28 70 28 70 50 Z" fill="#bae6fd" opacity="0.9"/><circle cx="32" cy="57" r="4" fill="#fff"/><circle cx="50" cy="60" r="4" fill="#fff"/><circle cx="68" cy="57" r="4" fill="#fff"/><path d="M35 72 L50 88 L65 72 Z" fill="#38bdf8"/></svg>`
+      },
+      {
+        id: 'ship_nebula',
+        name: 'Creuer Nebulosa',
+        emoji: '🛰️',
+        desc: 'Dissenyat per travessar galàxies de Base 10 a velocitat llum.',
+        unlocked: false,
+        svg: `<svg viewBox="0 0 100 100" class="w-full h-full"><defs><linearGradient id="g3" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#34d399"/><stop offset="100%" stop-color="#0d9488"/></linearGradient></defs><polygon points="50,8 78,68 50,58 22,68" fill="url(#g3)"/><polygon points="50,20 62,55 50,49 38,55" fill="#ecfdf5"/><rect x="36" y="64" width="8" height="16" rx="3" fill="#f59e0b"/><rect x="56" y="64" width="8" height="16" rx="3" fill="#f59e0b"/></svg>`
+      },
+      {
+        id: 'ship_supernova',
+        name: 'Fènix Supernova',
+        emoji: '🔥',
+        desc: 'La nau llegendària dels Mestres de les Potències.',
+        unlocked: false,
+        svg: `<svg viewBox="0 0 100 100" class="w-full h-full"><defs><linearGradient id="g4" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f472b6"/><stop offset="100%" stop-color="#7c3aed"/></linearGradient></defs><path d="M50 6 L72 42 L90 74 L62 66 L50 86 L38 66 L10 74 L28 42 Z" fill="url(#g4)"/><circle cx="50" cy="44" r="10" fill="#fef08a"/><path d="M42 82 L50 97 L58 82 Z" fill="#fb7185"/></svg>`
+      }
+    ];
+
+    const COLLECTIBLES = [
+      { id: 'c1', title: 'Mestre dels Quadrats', type: 'Insígnia', rarity: 'Comuna', icon: '🟦', desc: 'Domines les àrees i els quadrats fins a 12² = 144.', unlocked: false },
+      { id: 'c2', title: 'Arquitecte de Cubs', type: 'Insígnia', rarity: 'Comuna', icon: '🧊', desc: 'Saps calcular volums i cubs fins a 5³ = 125.', unlocked: false },
+      { id: 'c3', title: 'Rei del Base 10', type: 'Insígnia', rarity: 'Rara', icon: '🔟', desc: 'Comptes zeros amb la precisió d\'un ordinador quàntic.', unlocked: false },
+      { id: 'c4', title: 'Guardiana de l\'Exponent 0', type: 'Cromo Galàctic', rarity: 'Rara', icon: '⭕', desc: 'Recordes sempre que qualsevol nombre elevat a 0 val 1!', unlocked: false },
+      { id: 'c5', title: 'Calculador Làser', type: 'Insígnia', rarity: 'Rara', icon: '⚡', desc: 'Velocitat i punteria extraordinària en càlcul mental.', unlocked: false },
+      { id: 'c6', title: 'Cromo: El Robot 10⁶', type: 'Cromo Galàctic', rarity: 'Èpic', icon: '🤖', desc: 'Un milió d\'unitats d\'energia emmagatzemades en 6 zeros.', unlocked: false },
+      { id: 'c7', title: 'Cromo: Planeta Cubik', type: 'Cromo Galàctic', rarity: 'Èpic', icon: '🪐', desc: 'Un planeta cúbic on tot es mesura en potències de 3.', unlocked: false },
+      { id: 'c8', title: 'Corona de l\'Examen 10', type: 'Trofeu Llegendari', rarity: 'Llegendari', icon: '👑', desc: 'Emblema suprem per a l\'Andreu quan ho domini tot.', unlocked: false }
+    ];
+
+    /*************************************************************************
+     * 4. ESTAT GLOBAL DE LA SESSIÓ
+     *************************************************************************/
+    const state = {
+      crystals: 30, // Comença amb 30 cristalls de benvinguda per a l'Andreu
+      equippedShipId: 'ship_starter',
+      completedMissions: {},
+      currentMissionId: 1,
+      questions: [],
+      currentIndex: 0,
+      score: 0,
+      streak: 0,
+      bestStreak: 0,
+      earnedInRun: 0,
+      mistakes: [],
+      answeredCurrent: false
+    };
+
+    /*************************************************************************
+     * 5. UTILS MATEMÀTICS (SUPERÍNDEXS I FORMATACIÓ EN CATALÀ)
+     *************************************************************************/
+    const SUPERSCRIPTS = { '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹' };
+    function toSup(num) {
+      return String(num).split('').map(c => SUPERSCRIPTS[c] || c).join('');
+    }
+    function powStr(base, exp) {
+      return `${base}${toSup(exp)}`;
+    }
+    function formatNumCA(n) {
+      return Number(n).toLocaleString('ca-ES');
+    }
+    function shuffleArray(arr) {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+    function randInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    /*************************************************************************
+     * 6. GENERADOR DE PREGUNTES DE 6È DE PRIMÀRIA
+     *************************************************************************/
+    function generateMissionQuestions(missionId) {
+      const qs = [];
+
+      if (missionId === 1) {
+        // MISSIÓ 1: Concepte bàsic (base, exponent, producte <-> potència, lectura)
+        const pool = [
+          () => {
+            const b = randInt(2, 9), e = randInt(3, 5);
+            const product = Array(e).fill(b).join(' × ');
+            const correct = powStr(b, e);
+            return {
+              category: 'Producte a Potència',
+              type: 'choice',
+              prompt: 'Expressa aquesta multiplicació en forma de potència:',
+              math: product,
+              options: shuffleArray([correct, powStr(e, b), `${b} × ${e}`, powStr(b, e + 1)]),
+              answer: correct,
+              explanation: `El factor que es repeteix és el ${b} (la base) i apareix ${e} vegades (l'exponent). Per tant, s'escriu ${correct}.`
+            };
+          },
+          () => {
+            const b = randInt(2, 8), e = randInt(3, 4);
+            const correct = Array(e).fill(b).join(' × ');
+            return {
+              category: 'Potència a Producte',
+              type: 'choice',
+              prompt: 'Quina multiplicació correspon a aquesta potència?',
+              math: powStr(b, e),
+              options: shuffleArray([
+                correct,
+                Array(b).fill(e).join(' × '),
+                `${b} × ${e}`,
+                Array(e).fill(b).join(' + ')
+              ]),
+              answer: correct,
+              explanation: `${powStr(b, e)} vol dir multiplicar la base (${b}) per si mateixa ${e} vegades: ${correct}.`
+            };
+          },
+          () => {
+            let b = randInt(2, 9), e = randInt(2, 6);
+            if (b === e) e++;
+            return {
+              category: 'Parts de la Potència',
+              type: 'numeric',
+              prompt: `En la potència ${powStr(b, e)}, quin número és la BASE?`,
+              math: powStr(b, e),
+              answer: String(b),
+              explanation: `La base és el número gran de baix (${b}), que indica el factor que multipliquem.`
+            };
+          },
+          () => {
+            let b = randInt(2, 9), e = randInt(2, 6);
+            if (b === e) e++;
+            return {
+              category: 'Parts de la Potència',
+              type: 'numeric',
+              prompt: `En la potència ${powStr(b, e)}, quin número és l'EXPONENT?`,
+              math: powStr(b, e),
+              answer: String(e),
+              explanation: `L'exponent és el número petit de dalt (${e}), que indica quantes vegades es multiplica la base.`
+            };
+          },
+          () => {
+            const b = randInt(3, 9);
+            const isCube = Math.random() > 0.5;
+            const e = isCube ? 3 : 2;
+            const correct = isCube ? `${b} al cub` : `${b} al quadrat`;
+            const wrong1 = isCube ? `${b} al quadrat` : `${b} al cub`;
+            return {
+              category: 'Lectura de Potències',
+              type: 'choice',
+              prompt: 'Com es llegeix correctament aquesta potència?',
+              math: powStr(b, e),
+              options: shuffleArray([correct, wrong1, `${e} elevat a ${b}`, `${b} per ${e}`]),
+              answer: correct,
+              explanation: `Quan l'exponent és 2 diem "al quadrat" i quan és 3 diem "al cub". Per això ${powStr(b, e)} es llegeix "${correct}".`
+            };
+          }
+        ];
+
+        for (let i = 0; i < 8; i++) {
+          qs.push(pool[i % pool.length]());
+        }
+      } else if (missionId === 2) {
+        // MISSIÓ 2: Quadrats, cubs i casos especials (exponent 0 i exponent 1)
+        const pool = [
+          () => {
+            const b = randInt(2, 12);
+            const val = b * b;
+            return {
+              category: 'Càlcul de Quadrats',
+              type: 'choice',
+              prompt: 'Calcula el resultat d\'aquest quadrat:',
+              math: powStr(b, 2),
+              options: shuffleArray([
+                String(val),
+                String(b * 2),
+                String(val + b),
+                String(Math.max(1, val - 2))
+              ]),
+              answer: String(val),
+              explanation: `${powStr(b, 2)} significa ${b} × ${b} = ${val} (no és ${b} × 2!).`
+            };
+          },
+          () => {
+            const b = randInt(2, 5);
+            const val = b * b * b;
+            return {
+              category: 'Càlcul de Cubs',
+              type: 'choice',
+              prompt: 'Quin és el resultat d\'aquest cub?',
+              math: powStr(b, 3),
+              options: shuffleArray([
+                String(val),
+                String(b * 3),
+                String(b * b),
+                String(val + b)
+              ]),
+              answer: String(val),
+              explanation: `${powStr(b, 3)} = ${b} × ${b} × ${b} = ${b * b} × ${b} = ${val}.`
+            };
+          },
+          () => {
+            const b = randInt(3, 25);
+            return {
+              category: 'Cas Especial: Exponent 0',
+              type: 'choice',
+              prompt: 'Atenció al poder secret! Quant val aquesta potència?',
+              math: powStr(b, 0),
+              options: shuffleArray(['1', '0', String(b), '10']),
+              answer: '1',
+              explanation: `Qualsevol nombre (diferent de zero) elevat a exponent 0 sempre dona 1. Per tant, ${powStr(b, 0)} = 1.`
+            };
+          },
+          () => {
+            const b = randInt(4, 19);
+            return {
+              category: 'Cas Especial: Exponent 1',
+              type: 'numeric',
+              prompt: 'Calcula aquesta potència d\'exponent 1:',
+              math: powStr(b, 1),
+              answer: String(b),
+              explanation: `Un nombre elevat a 1 és igual a ell mateix: ${powStr(b, 1)} = ${b}.`
+            };
+          },
+          () => {
+            const b = randInt(6, 11);
+            const sq = b * b;
+            return {
+              category: 'Quadrats Inversos',
+              type: 'choice',
+              prompt: `Quina potència té com a resultat ${sq}?`,
+              math: `? = ${sq}`,
+              options: shuffleArray([powStr(b, 2), powStr(sq / 2, 2), powStr(b - 1, 2), powStr(b + 1, 2)]),
+              answer: powStr(b, 2),
+              explanation: `Com que ${b} × ${b} = ${sq}, la potència correcta és ${powStr(b, 2)}.`
+            };
+          }
+        ];
+
+        for (let i = 0; i < 8; i++) {
+          qs.push(pool[i % pool.length]());
+        }
+      } else if (missionId === 3) {
+        // MISSIÓ 3: Potències de base 10 i descomposició polinòmica
+        const pool = [
+          () => {
+            const exp = randInt(2, 6);
+            const val = Math.pow(10, exp);
+            const correct = formatNumCA(val);
+            return {
+              category: 'Potència de Base 10',
+              type: 'choice',
+              prompt: 'Calcula el valor d\'aquesta potència de base 10:',
+              math: powStr(10, exp),
+              options: shuffleArray([
+                correct,
+                formatNumCA(Math.pow(10, exp - 1)),
+                formatNumCA(Math.pow(10, exp + 1)),
+                formatNumCA(10 * exp)
+              ]),
+              answer: correct,
+              explanation: `${powStr(10, exp)} és un 1 seguit de ${exp} zeros: ${correct}.`
+            };
+          },
+          () => {
+            const exp = randInt(2, 5);
+            const val = Math.pow(10, exp);
+            const correct = powStr(10, exp);
+            return {
+              category: 'Nombre a Potència de 10',
+              type: 'choice',
+              prompt: 'Expressa aquest nombre com a potència de base 10:',
+              math: formatNumCA(val),
+              options: shuffleArray([
+                correct,
+                powStr(10, exp - 1),
+                powStr(10, exp + 1),
+                powStr(exp, 10)
+              ]),
+              answer: correct,
+              explanation: `El nombre ${formatNumCA(val)} té ${exp} zeros darrere de l'1, per tant és ${correct}.`
+            };
+          },
+          () => {
+            // Descomposició polinòmica: ex 3.400 = 3 × 10³ + 4 × 10²
+            const d1 = randInt(2, 9);
+            const d2 = randInt(1, 9);
+            const num = d1 * 1000 + d2 * 100;
+            const correct = `${d1} × 10³ + ${d2} × 10²`;
+            return {
+              category: 'Descomposició Polinòmica',
+              type: 'choice',
+              prompt: `Com es descompon ${formatNumCA(num)} amb potències de base 10?`,
+              math: formatNumCA(num),
+              options: shuffleArray([
+                correct,
+                `${d1} × 10⁴ + ${d2} × 10³`,
+                `${d1} × 10² + ${d2} × 10¹`,
+                `${d1} × 10³ + ${d2} × 10¹`
+              ]),
+              answer: correct,
+              explanation: `${formatNumCA(num)} = ${formatNumCA(d1 * 1000)} + ${d2 * 100} = ${d1} × 10³ + ${d2} × 10².`
+            };
+          },
+          () => {
+            // Composició des de potències de 10
+            const c1 = randInt(2, 8);
+            const c2 = randInt(1, 9);
+            const total = c1 * 10000 + c2 * 100;
+            return {
+              category: 'Composició Base 10',
+              type: 'numeric',
+              prompt: 'Quin nombre correspon a aquesta expressió?',
+              math: `${c1} × 10⁴ + ${c2} × 10²`,
+              hint: '10⁴ = 10.000 i 10² = 100',
+              answer: String(total),
+              explanation: `${c1} × 10.000 + ${c2} × 100 = ${formatNumCA(c1 * 10000)} + ${c2 * 100} = ${formatNumCA(total)}.`
+            };
+          }
+        ];
+
+        for (let i = 0; i < 8; i++) {
+          qs.push(pool[i % pool.length]());
+        }
+      } else if (missionId === 5) {
+        // MISSIÓ 5: ARRELS DE 6È DE PRIMÀRIA (exactes, costat de quadrat i estimacions)
+        const pool = [
+          () => {
+            const root = randInt(2, 12);
+            const square = root * root;
+            return {
+              category: 'Arrel Quadrada Exacta',
+              type: 'numeric',
+              prompt: `Andreu, calcula aquesta arrel quadrada:`,
+              math: `√${square}`,
+              hint: `Quin nombre multiplicat per ell mateix dona ${square}?`,
+              answer: String(root),
+              explanation: `√${square} = ${root}, perquè ${root} × ${root} = ${powStr(root, 2)} = ${square}.`
+            };
+          },
+          () => {
+            const root = randInt(3, 12);
+            const square = root * root;
+            const distractors = shuffleArray([
+              String(root + 1),
+              String(Math.max(2, root - 1)),
+              String(Math.round(square / 2))
+            ]).filter(d => d !== String(root)).slice(0, 3);
+            return {
+              category: 'Relació Potència i Arrel',
+              type: 'choice',
+              prompt: `Si ${powStr(root, 2)} = ${square}, quin és el valor de √${square}?`,
+              math: `√${square} = ?`,
+              options: shuffleArray([String(root), ...distractors]),
+              answer: String(root),
+              explanation: `L'arrel quadrada és l'operació inversa del quadrat: com que ${powStr(root, 2)} = ${square}, √${square} = ${root}.`
+            };
+          },
+          () => {
+            const side = randInt(3, 12);
+            const area = side * side;
+            return {
+              category: 'Problema d\'Àrea i Arrel',
+              type: 'numeric',
+              prompt: `Un terreny quadrat té una àrea de ${area} m². Quants metres mesura cada costat?`,
+              math: `Àrea = ${area} m²`,
+              hint: `El costat d'un quadrat és l'arrel quadrada de la seva àrea.`,
+              answer: String(side),
+              explanation: `Per trobar el costat calculem √${area} = ${side} m, ja que ${side} × ${side} = ${area} m².`
+            };
+          },
+          () => {
+            const low = randInt(2, 8);
+            const high = low + 1;
+            const target = randInt(low * low + 1, high * high - 1);
+            const correct = `Entre ${low} i ${high}`;
+            return {
+              category: 'Estimació d\'Arrels',
+              type: 'choice',
+              prompt: `Entre quins dos nombres enters consecutius es troba √${target}?`,
+              math: `√${target}`,
+              options: shuffleArray([
+                correct,
+                `Entre ${Math.max(1, low - 1)} i ${low}`,
+                `Entre ${high} i ${high + 1}`,
+                `Entre ${low} i ${high + 2}`
+              ]),
+              answer: correct,
+              explanation: `Com que ${powStr(low, 2)} = ${low * low} i ${powStr(high, 2)} = ${high * high}, tenim ${low * low} < ${target} < ${high * high}. Per tant, √${target} està ${correct.toLowerCase()}.`
+            };
+          }
+        ];
+
+        for (let i = 0; i < 8; i++) {
+          qs.push(pool[i % pool.length]());
+        }
+      } else {
+        // MISSIÓ 4: REPTE FINAL (Mix Examen de 10 preguntes variades incloent arrels)
+        const m1 = generateMissionQuestions(1);
+        const m2 = generateMissionQuestions(2);
+        const m3 = generateMissionQuestions(3);
+        const m5 = generateMissionQuestions(5);
+        const mixed = shuffleArray([...m1.slice(0, 2), ...m2.slice(0, 3), ...m3.slice(0, 2), ...m5.slice(0, 3)]);
+        return mixed.slice(0, 10);
+      }
+
+      return shuffleArray(qs);
+    }
+
+    /*************************************************************************
+     * 7. CONTROL DE NAVEGACIÓ I FLUX DE PARTIDA
+     *************************************************************************/
+    const MISSION_META = {
+      1: { title: 'Planeta 1 · El Codi de les Potències', reward: 10 },
+      2: { title: 'Planeta 2 · Quadrats, Cubs i Poders Especials', reward: 12 },
+      3: { title: 'Planeta 3 · Galàxia Base 10', reward: 15 },
+      4: { title: '⚡ Gran Supernova · Simulacre d\'Examen', reward: 20 },
+      5: { title: '√ Nèbula de les Arrels · 6è de Primària', reward: 18 }
+    };
+
+    function showScreen(screenId) {
+      ['screen-home', 'screen-game', 'screen-summary'].forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+      });
+      document.getElementById(screenId).classList.remove('hidden');
+
+      const hudStreak = document.getElementById('hud-streak-badge');
+      if (screenId === 'screen-game') {
+        document.body.classList.add('in-game-mode');
+        hudStreak.classList.remove('hidden');
+        hudStreak.classList.add('flex');
+      } else {
+        document.body.classList.remove('in-game-mode');
+        hudStreak.classList.add('hidden');
+        hudStreak.classList.remove('flex');
+      }
+    }
+
+    function goHome() {
+      SoundFX.click();
+      updateHUD();
+      showScreen('screen-home');
+    }
+
+    function confirmExitMission() {
+      SoundFX.click();
+      openModal('exit-confirm');
+    }
+
+    function startMission(missionId) {
+      SoundFX.click();
+      state.currentMissionId = missionId;
+      state.questions = generateMissionQuestions(missionId);
+      state.currentIndex = 0;
+      state.score = 0;
+      state.streak = 0;
+      state.bestStreak = 0;
+      state.earnedInRun = 0;
+      state.mistakes = [];
+
+      document.getElementById('game-mission-title').textContent = MISSION_META[missionId].title;
+      document.getElementById('game-q-total').textContent = state.questions.length;
+
+      showScreen('screen-game');
+      renderCurrentQuestion();
+    }
+
+    function retryCurrentMission() {
+      startMission(state.currentMissionId);
+    }
+
+    function getStreakMultiplier() {
+      if (state.streak >= 5) return 3;
+      if (state.streak >= 3) return 2;
+      return 1;
+    }
+
+    function updateComboUI() {
+      const mult = getStreakMultiplier();
+      const pill = document.getElementById('combo-pill');
+      const text = document.getElementById('combo-text');
+      const flame = document.getElementById('combo-flame');
+      const hudFlame = document.getElementById('hud-streak-flame');
+      const hudMult = document.getElementById('hud-streak-mult');
+
+      text.textContent = `Ratxa: ${state.streak} (x${mult})`;
+      if (hudMult) hudMult.textContent = `x${mult}`;
+
+      if (mult === 3) {
+        pill.className = 'flex items-center gap-1.5 px-2.5 py-0.5 sm:px-3.5 sm:py-1 rounded-full bg-gradient-to-r from-amber-500 to-rose-500 text-slate-950 border border-amber-200 shadow-lg shadow-amber-500/30 scale-105 transition-all shrink-0';
+        text.className = 'font-display font-bold text-[11px] sm:text-sm text-slate-950';
+        flame.textContent = '💥';
+        if (hudFlame) hudFlame.textContent = '💥';
+      } else if (mult === 2) {
+        pill.className = 'flex items-center gap-1.5 px-2.5 py-0.5 sm:px-3.5 sm:py-1 rounded-full bg-gradient-to-r from-cyan-500 to-indigo-500 text-white border border-cyan-200 shadow-md transition-all shrink-0';
+        text.className = 'font-display font-bold text-[11px] sm:text-sm text-white';
+        flame.textContent = '⚡';
+        if (hudFlame) hudFlame.textContent = '⚡';
+      } else {
+        pill.className = 'flex items-center gap-1.5 px-2.5 py-0.5 sm:px-3.5 sm:py-1 rounded-full bg-slate-800 border border-slate-600 transition-all shrink-0';
+        text.className = 'font-display font-bold text-[11px] sm:text-sm text-slate-200';
+        flame.textContent = '🔥';
+        if (hudFlame) hudFlame.textContent = '🔥';
+      }
+    }
+
+    function renderCurrentQuestion() {
+      state.answeredCurrent = false;
+      const q = state.questions[state.currentIndex];
+      const total = state.questions.length;
+      const baseReward = MISSION_META[state.currentMissionId].reward;
+      const mult = getStreakMultiplier();
+
+      // Actualitzar barra superior
+      document.getElementById('game-q-current').textContent = state.currentIndex + 1;
+      const pct = ((state.currentIndex) / total) * 100;
+      document.getElementById('game-progress-bar').style.width = `${Math.max(pct, 6)}%`;
+      updateComboUI();
+
+      // Etiquetes de pregunta
+      document.getElementById('q-category-tag').textContent = q.category;
+      document.getElementById('q-reward-tag').textContent = `+${baseReward * mult} 💎`;
+      document.getElementById('q-prompt').textContent = q.prompt;
+      document.getElementById('q-math-display').textContent = q.math;
+
+      const hintEl = document.getElementById('q-hint');
+      if (q.hint) {
+        hintEl.textContent = `💡 Pista: ${q.hint}`;
+        hintEl.classList.remove('hidden');
+      } else {
+        hintEl.classList.add('hidden');
+      }
+
+      // Amagar feedback anterior
+      const fb = document.getElementById('feedback-banner');
+      fb.classList.add('hidden');
+
+      const optionsGrid = document.getElementById('answer-options-grid');
+      const numericBox = document.getElementById('answer-numeric-box');
+
+      if (q.type === 'choice') {
+        optionsGrid.classList.remove('hidden');
+        numericBox.classList.add('hidden');
+        optionsGrid.innerHTML = '';
+
+        // Si alguna opció és llarga (ex. descomposició polinòmica), fem servir 1 columna en mòbil i 2 en escriptori
+        const hasLongOption = q.options.some(opt => String(opt).length > 12);
+        optionsGrid.className = hasLongOption
+          ? 'grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3.5 pt-1 shrink-0'
+          : 'grid grid-cols-2 gap-2 sm:gap-3.5 pt-1 shrink-0';
+
+        q.options.forEach((opt, idx) => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'btn-3d option-btn bg-slate-800/95 hover:bg-indigo-900/90 border-2 border-indigo-400/40 hover:border-cyan-300 text-white font-display font-bold text-base sm:text-xl py-3 sm:py-4 px-3 sm:px-5 rounded-2xl shadow-[0_4px_0_#1e1b4b] transition flex items-center justify-between gap-2 text-left';
+          const letters = ['A', 'B', 'C', 'D'];
+          btn.innerHTML = `
+            <span class="w-6 h-6 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-indigo-500/30 border border-indigo-400/40 flex items-center justify-center text-xs sm:text-sm text-cyan-300 shrink-0">${letters[idx]}</span>
+            <span class="flex-1 text-center leading-tight">${opt}</span>
+            <span class="w-3 sm:w-6 shrink-0"></span>
+          `;
+          btn.onclick = (e) => evaluateAnswer(opt, e.currentTarget);
+          optionsGrid.appendChild(btn);
+        });
+      } else {
+        optionsGrid.classList.add('hidden');
+        numericBox.classList.remove('hidden');
+        const inp = document.getElementById('numeric-input');
+        const keypad = document.getElementById('spatial-keypad');
+        inp.value = '';
+        inp.disabled = false;
+        keypad.classList.remove('hidden');
+        document.getElementById('btn-submit-numeric').disabled = false;
+
+        // En dispositius tàctils fem servir el Teclat Numèric Espacial; en escriptori permetem teclat físic
+        const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+        if (isTouchDevice) {
+          inp.setAttribute('readonly', 'readonly');
+        } else {
+          inp.removeAttribute('readonly');
+          setTimeout(() => inp.focus(), 60);
+        }
+      }
+    }
+
+    // Helpers teclat numèric
+    function appendDigit(d) {
+      if (state.answeredCurrent) return;
+      SoundFX.click();
+      const inp = document.getElementById('numeric-input');
+      if (inp.value.length < 10) inp.value += d;
+    }
+    function backspaceDigit() {
+      if (state.answeredCurrent) return;
+      SoundFX.click();
+      const inp = document.getElementById('numeric-input');
+      inp.value = inp.value.slice(0, -1);
+    }
+    function clearDigits() {
+      if (state.answeredCurrent) return;
+      SoundFX.click();
+      document.getElementById('numeric-input').value = '';
+    }
+
+    function submitNumericAnswer() {
+      if (state.answeredCurrent) return;
+      const inp = document.getElementById('numeric-input');
+      // Permet escriure punts de milers opcionalment (ex: 10.000 o 10000)
+      const cleaned = inp.value.replace(/\./g, '').replace(/\s+/g, '').trim();
+      if (!cleaned) {
+        inp.classList.add('animate-shake');
+        setTimeout(() => inp.classList.remove('animate-shake'), 450);
+        return;
+      }
+      evaluateAnswer(cleaned, document.getElementById('btn-submit-numeric'));
+    }
+
+    // Permet prémer Enter al camp numèric
+    document.getElementById('numeric-input').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (!state.answeredCurrent) {
+          submitNumericAnswer();
+        } else {
+          nextQuestion();
+        }
+      }
+    });
+
+    function evaluateAnswer(userAnswer, sourceElement) {
+      if (state.answeredCurrent) return;
+      state.answeredCurrent = true;
+
+      const q = state.questions[state.currentIndex];
+      const normalizedUser = String(userAnswer).replace(/\./g, '').trim();
+      const normalizedCorrect = String(q.answer).replace(/\./g, '').trim();
+      const isCorrect = normalizedUser === normalizedCorrect;
+
+      const fb = document.getElementById('feedback-banner');
+      const fbIcon = document.getElementById('feedback-icon');
+      const fbTitle = document.getElementById('feedback-title');
+      const fbExp = document.getElementById('feedback-explanation');
+      const card = document.getElementById('question-card');
+
+      // Bloquejar controls d'entrada
+      if (q.type === 'choice') {
+        document.querySelectorAll('.option-btn').forEach(btn => {
+          btn.disabled = true;
+          const btnText = btn.children[1].textContent.trim();
+          if (btnText === q.answer) {
+            btn.classList.remove('bg-slate-800/95', 'border-indigo-400/40');
+            btn.classList.add('bg-emerald-600/90', 'border-emerald-300', 'text-white');
+          } else if (btn === sourceElement && !isCorrect) {
+            btn.classList.remove('bg-slate-800/95', 'border-indigo-400/40');
+            btn.classList.add('bg-rose-600/90', 'border-rose-300', 'text-white');
+          } else {
+            btn.classList.add('opacity-50');
+          }
+        });
+      } else {
+        document.getElementById('numeric-input').disabled = true;
+        document.getElementById('btn-submit-numeric').disabled = true;
+        // En mòbil amaguem el keypad en respondre perquè el feedback càpiga sense scroll
+        if (window.innerWidth <= 640) {
+          document.getElementById('spatial-keypad').classList.add('hidden');
+        }
+      }
+
+      if (isCorrect) {
+        state.score++;
+        state.streak++;
+        if (state.streak > state.bestStreak) state.bestStreak = state.streak;
+
+        const mult = getStreakMultiplier();
+        const gained = MISSION_META[state.currentMissionId].reward * mult;
+        state.crystals += gained;
+        state.earnedInRun += gained;
+
+        SoundFX.correct(state.streak);
+        updateHUD();
+        const praises = [
+          'Excel·lent, Andreu!',
+          'Brillant, Andreu!',
+          'Diana còsmica, Andreu!',
+          'Genial, pilot Andreu!',
+          'Imparable, Andreu!'
+        ];
+        const praise = praises[Math.floor(Math.random() * praises.length)];
+
+        fb.className = 'rounded-2xl p-4 sm:p-5 border-2 bg-emerald-950/90 border-emerald-400 text-emerald-100 animate-pop';
+        fbIcon.textContent = mult >= 3 ? '💥' : (mult === 2 ? '⚡' : '🌟');
+        fbTitle.textContent = `${praise} (+${gained} 💎)`;
+        fbExp.textContent = q.explanation;
+      } else {
+        state.streak = 0;
+        SoundFX.wrong();
+        updateComboUI();
+
+        card.classList.add('animate-shake');
+        setTimeout(() => card.classList.remove('animate-shake'), 450);
+
+        // Guardar error per a la pantalla final de repàs
+        state.mistakes.push({
+          prompt: q.prompt,
+          math: q.math,
+          userAnswer: userAnswer,
+          correctAnswer: q.answer,
+          explanation: q.explanation
+        });
+
+        fb.className = 'rounded-2xl p-4 sm:p-5 border-2 bg-rose-950/90 border-rose-400 text-rose-100 animate-pop';
+        fbIcon.textContent = '🛸';
+        fbTitle.textContent = `Gairebé! La resposta correcta és: ${q.answer}`;
+        fbExp.textContent = q.explanation;
+      }
+
+      fb.classList.remove('hidden');
+
+      // Canviar text del botó si és l'última pregunta
+      const nextBtn = document.getElementById('btn-next-question');
+      nextBtn.textContent = (state.currentIndex === state.questions.length - 1)
+        ? 'Veure Resultats 🏆'
+        : 'Següent →';
+    }
+
+    function nextQuestion() {
+      SoundFX.click();
+      state.currentIndex++;
+      if (state.currentIndex < state.questions.length) {
+        renderCurrentQuestion();
+      } else {
+        finishMission();
+      }
+    }
+
+    function finishMission() {
+      SoundFX.levelUp();
+      document.getElementById('game-progress-bar').style.width = '100%';
+      state.completedMissions[state.currentMissionId] = true;
+
+      // Actualitzar badges al mapa
+      const badgeEl = document.getElementById(`badge-m${state.currentMissionId}`);
+      if (badgeEl) badgeEl.textContent = '✅';
+
+      // Omplir estadístiques de resum
+      const total = state.questions.length;
+      document.getElementById('stat-score').textContent = `${state.score}/${total}`;
+      document.getElementById('stat-streak').textContent = `${state.bestStreak} 🔥`;
+      document.getElementById('stat-crystals').textContent = `+${state.earnedInRun} 💎`;
+
+      const ratio = state.score / total;
+      const heading = document.getElementById('summary-heading');
+      const subtext = document.getElementById('summary-subtext');
+      const trophyIcon = document.getElementById('summary-trophy-icon');
+
+      if (ratio === 1) {
+        trophyIcon.textContent = '👑';
+        heading.textContent = 'Puntuació Perfecta, Andreu! 10/10!';
+        subtext.textContent = 'Has demostrat un domini absolut de les potències i les arrels, Andreu.';
+        spawnBurst(window.innerWidth * 0.3, window.innerHeight * 0.35, 45);
+        spawnBurst(window.innerWidth * 0.7, window.innerHeight * 0.35, 45);
+      } else if (ratio >= 0.7) {
+        trophyIcon.textContent = '🏆';
+        heading.textContent = 'Molt bona feina, Andreu!';
+        subtext.textContent = 'Estàs molt a punt per a l\'examen. Revisa els petits detalls a sota!';
+        spawnBurst(window.innerWidth * 0.5, window.innerHeight * 0.35, 35);
+      } else {
+        trophyIcon.textContent = '🧭';
+        heading.textContent = 'Bon entrenament espacial, Andreu!';
+        subtext.textContent = 'Llegeix amb calma el quadern d\'errors i torna-ho a intentar per millorar.';
+      }
+
+      // Avís de cofre disponible
+      const chestCallout = document.getElementById('summary-chest-callout');
+      if (state.crystals >= 50) {
+        chestCallout.classList.remove('hidden');
+      } else {
+        chestCallout.classList.add('hidden');
+      }
+
+      // Quadern de repàs d'errors
+      const mistakesContainer = document.getElementById('mistakes-review-container');
+      const mistakesList = document.getElementById('mistakes-list');
+      const perfectBanner = document.getElementById('perfect-banner');
+
+      if (state.mistakes.length > 0) {
+        mistakesContainer.classList.remove('hidden');
+        perfectBanner.classList.add('hidden');
+        mistakesList.innerHTML = '';
+
+        state.mistakes.forEach((m, idx) => {
+          const item = document.createElement('div');
+          item.className = 'bg-slate-950/90 border border-rose-400/30 rounded-2xl p-3.5 space-y-1.5';
+          item.innerHTML = `
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <span class="text-xs font-extrabold text-slate-400">Error #${idx + 1} · ${m.prompt}</span>
+              <span class="font-display font-bold text-amber-300 bg-slate-900 px-2.5 py-0.5 rounded-lg border border-slate-700">${m.math}</span>
+            </div>
+            <div class="flex flex-wrap items-center gap-3 text-xs sm:text-sm">
+              <span class="text-rose-400 font-bold">Vas respondre: <del>${m.userAnswer}</del></span>
+              <span class="text-emerald-400 font-extrabold">Correcta: ${m.correctAnswer}</span>
+            </div>
+            <p class="text-xs text-slate-300 leading-relaxed bg-slate-900/70 p-2 rounded-xl">
+              💡 ${m.explanation}
+            </p>
+          `;
+          mistakesList.appendChild(item);
+        });
+      } else {
+        mistakesContainer.classList.add('hidden');
+        perfectBanner.classList.remove('hidden');
+      }
+
+      updateHUD();
+      showScreen('screen-summary');
+    }
+
+    /*************************************************************************
+     * 8. SISTEMA DE COFRES, BOTIGA I VITRINA DE TROFEUS
+     *************************************************************************/
+    function updateHUD() {
+      document.getElementById('hud-crystals').textContent = state.crystals;
+      document.getElementById('modal-crystals-count').textContent = state.crystals;
+
+      // Comptar desbloquejats totals (naus + cromos/insígnies)
+      const unlockedShips = SHIPS.filter(s => s.unlocked).length;
+      const unlockedCols = COLLECTIBLES.filter(c => c.unlocked).length;
+      const totalItems = SHIPS.length + COLLECTIBLES.length;
+      document.getElementById('hud-trophies').textContent = `${unlockedShips + unlockedCols}/${totalItems}`;
+
+      // Punt vermell de notificació si pot comprar un cofre (50 cristalls) i encara queden premis
+      const hasLockedItems = (unlockedShips + unlockedCols) < totalItems;
+      const canBuy = state.crystals >= 50 && hasLockedItems;
+      document.getElementById('shop-notif-dot').classList.toggle('hidden', !canBuy);
+      document.getElementById('shop-notif-static').classList.toggle('hidden', !canBuy);
+
+      // Actualitzar visual de la nau equipada
+      const currentShip = SHIPS.find(s => s.id === state.equippedShipId) || SHIPS[0];
+      document.getElementById('header-ship-icon').textContent = currentShip.emoji;
+      document.getElementById('home-ship-visual').innerHTML = currentShip.svg;
+      document.getElementById('home-ship-name').textContent = currentShip.name;
+
+      // Actualitzar rang segons col·lecció
+      const totalUnlocked = unlockedShips + unlockedCols;
+      let rank = 'Cadet Estel·lar';
+      if (totalUnlocked >= 10) rank = 'Gran Almirall de les Potències 👑';
+      else if (totalUnlocked >= 6) rank = 'Capità/ana Quàntic/a 🌟';
+      else if (totalUnlocked >= 3) rank = 'Explorador/a Galàctic/a 🚀';
+      document.getElementById('home-rank-name').textContent = rank;
+    }
+
+    function openModal(modalName) {
+      SoundFX.click();
+      const backdrop = document.getElementById('modal-backdrop');
+      backdrop.classList.remove('hidden');
+
+      ['modal-shop', 'modal-trophy', 'modal-cheatsheet', 'modal-exit-confirm', 'modal-ios-fullscreen'].forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+      });
+
+      if (modalName === 'shop') {
+        document.getElementById('chest-opening-stage').classList.add('hidden');
+        document.getElementById('modal-crystals-count').textContent = state.crystals;
+        refreshShopButtons();
+        document.getElementById('modal-shop').classList.remove('hidden');
+      } else if (modalName === 'trophy') {
+        renderTrophyCabinet();
+        document.getElementById('modal-trophy').classList.remove('hidden');
+      } else if (modalName === 'cheatsheet') {
+        document.getElementById('modal-cheatsheet').classList.remove('hidden');
+      } else if (modalName === 'exit-confirm') {
+        document.getElementById('modal-exit-confirm').classList.remove('hidden');
+      } else if (modalName === 'ios-fullscreen') {
+        document.getElementById('modal-ios-fullscreen').classList.remove('hidden');
+      }
+    }
+
+    function closeAllModals() {
+      document.getElementById('modal-backdrop').classList.add('hidden');
+    }
+
+    function handleBackdropClick(e) {
+      if (e.target.id === 'modal-backdrop') {
+        closeAllModals();
+      }
+    }
+
+    function refreshShopButtons() {
+      const btnStd = document.getElementById('btn-buy-standard');
+      const btnSup = document.getElementById('btn-buy-supernova');
+      const msg = document.getElementById('shop-status-msg');
+
+      const lockedCols = COLLECTIBLES.filter(c => !c.unlocked);
+      const lockedShips = SHIPS.filter(s => !s.unlocked);
+
+      if (lockedCols.length === 0 && lockedShips.length === 0) {
+        btnStd.disabled = true;
+        btnSup.disabled = true;
+        btnStd.textContent = 'Col·lecció Completa! 🎉';
+        btnSup.textContent = 'Col·lecció Completa! 🎉';
+        msg.textContent = 'Has desbloquejat ABSOLUTAMENT TOTS els premis de l\'Acadèmia!';
+        return;
+      }
+
+      btnStd.disabled = state.crystals < 50;
+      btnStd.classList.toggle('opacity-50', state.crystals < 50);
+
+      btnSup.disabled = state.crystals < 100;
+      btnSup.classList.toggle('opacity-50', state.crystals < 100);
+    }
+
+    function buyChest(tier) {
+      const cost = tier === 'supernova' ? 100 : 50;
+      if (state.crystals < cost) {
+        SoundFX.wrong();
+        const msg = document.getElementById('shop-status-msg');
+        msg.textContent = `Et falten ${cost - state.crystals} cristalls 💎 per obrir aquest cofre!`;
+        msg.classList.add('text-rose-400');
+        setTimeout(() => msg.classList.remove('text-rose-400'), 1500);
+        return;
+      }
+
+      const lockedCols = COLLECTIBLES.filter(c => !c.unlocked);
+      const lockedShips = SHIPS.filter(s => !s.unlocked);
+
+      if (lockedCols.length === 0 && lockedShips.length === 0) return;
+
+      state.crystals -= cost;
+      SoundFX.chestOpen();
+
+      let rewardObj = null;
+
+      if (tier === 'supernova' && lockedShips.length > 0) {
+        // Prioritza desbloquejar una nau espacial nova
+        const chosenShip = lockedShips[Math.floor(Math.random() * lockedShips.length)];
+        chosenShip.unlocked = true;
+        state.equippedShipId = chosenShip.id; // L'equipa automàticament!
+        rewardObj = {
+          visual: chosenShip.emoji,
+          title: chosenShip.name,
+          desc: `${chosenShip.desc} (S'ha equipat al teu hangar!)`,
+          type: '🚀 Nova Nau Espacial!'
+        };
+      } else if (lockedCols.length > 0) {
+        const chosenCol = lockedCols[Math.floor(Math.random() * lockedCols.length)];
+        chosenCol.unlocked = true;
+        rewardObj = {
+          visual: chosenCol.icon,
+          title: chosenCol.title,
+          desc: chosenCol.desc,
+          type: `✨ ${chosenCol.type} · ${chosenCol.rarity}`
+        };
+      } else if (lockedShips.length > 0) {
+        const chosenShip = lockedShips[Math.floor(Math.random() * lockedShips.length)];
+        chosenShip.unlocked = true;
+        state.equippedShipId = chosenShip.id;
+        rewardObj = {
+          visual: chosenShip.emoji,
+          title: chosenShip.name,
+          desc: chosenShip.desc,
+          type: '🚀 Nova Nau Espacial!'
+        };
+      }
+
+      // Mostrar animació del premi desbloquejat
+      const stage = document.getElementById('chest-opening-stage');
+      document.getElementById('unlocked-reward-visual').textContent = rewardObj.visual;
+      document.getElementById('unlocked-reward-title').textContent = rewardObj.title;
+      document.getElementById('unlocked-reward-desc').textContent = rewardObj.desc;
+      document.getElementById('unlocked-reward-type').textContent = rewardObj.type;
+
+      stage.classList.remove('hidden');
+      spawnBurst(window.innerWidth * 0.5, window.innerHeight * 0.4, 55);
+
+      updateHUD();
+      refreshShopButtons();
+    }
+
+    function renderTrophyCabinet() {
+      const hangarGrid = document.getElementById('hangar-grid');
+      hangarGrid.innerHTML = '';
+
+      SHIPS.forEach(ship => {
+        const isEquipped = state.equippedShipId === ship.id;
+        const card = document.createElement('div');
+
+        if (ship.unlocked) {
+          card.className = `cursor-pointer rounded-2xl p-3 text-center border-2 transition ${
+            isEquipped
+              ? 'bg-indigo-900/80 border-cyan-400 shadow-lg shadow-cyan-500/20'
+              : 'bg-slate-950/80 border-slate-700 hover:border-indigo-400'
+          }`;
+          card.innerHTML = `
+            <div class="w-14 h-14 mx-auto mb-1">${ship.svg}</div>
+            <p class="font-display font-bold text-xs sm:text-sm text-white">${ship.name}</p>
+            <span class="inline-block mt-1 px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
+              isEquipped ? 'bg-cyan-400 text-slate-950' : 'bg-slate-800 text-slate-300'
+            }">
+              ${isEquipped ? 'Equipada ✓' : 'Equipar'}
+            </span>
+          `;
+          card.onclick = () => {
+            SoundFX.click();
+            state.equippedShipId = ship.id;
+            updateHUD();
+            renderTrophyCabinet();
+          };
+        } else {
+          card.className = 'rounded-2xl p-3 text-center border-2 border-dashed border-slate-800 bg-slate-950/40 opacity-60';
+          card.innerHTML = `
+            <div class="w-14 h-14 mx-auto mb-1 flex items-center justify-center text-3xl">🔒</div>
+            <p class="font-display font-bold text-xs text-slate-500">Nau Secreta</p>
+            <span class="inline-block mt-1 text-[10px] text-slate-500 font-bold">Cofre Supernova</span>
+          `;
+        }
+        hangarGrid.appendChild(card);
+      });
+
+      const colGrid = document.getElementById('collection-grid');
+      colGrid.innerHTML = '';
+
+      COLLECTIBLES.forEach(item => {
+        const card = document.createElement('div');
+        if (item.unlocked) {
+          card.className = 'rounded-2xl p-3.5 text-center bg-gradient-to-b from-slate-800/90 to-slate-950 border border-amber-400/40 shadow-md flex flex-col justify-between';
+          card.innerHTML = `
+            <div>
+              <div class="text-4xl mb-1.5">${item.icon}</div>
+              <p class="font-display font-bold text-xs sm:text-sm text-amber-200 leading-tight">${item.title}</p>
+              <p class="text-[11px] text-slate-300 mt-1 leading-snug">${item.desc}</p>
+            </div>
+            <span class="mt-2 inline-block text-[10px] font-extrabold uppercase tracking-wider text-cyan-300 bg-cyan-950/80 px-2 py-0.5 rounded-full">
+              ${item.type}
+            </span>
+          `;
+        } else {
+          card.className = 'rounded-2xl p-3.5 text-center border border-dashed border-slate-800 bg-slate-950/40 flex flex-col items-center justify-center opacity-55 min-h-[130px]';
+          card.innerHTML = `
+            <div class="text-3xl mb-1">❓</div>
+            <p class="font-display font-bold text-xs text-slate-500">Premi Bloquejat</p>
+            <p class="text-[10px] text-slate-600 mt-0.5">Obre cofres per descobrir-lo</p>
+          `;
+        }
+        colGrid.appendChild(card);
+      });
+    }
+
+    /*************************************************************************
+     * 9. GENERACIÓ DE FONS ESTRELLAT I INICIALITZACIÓ AL CARREGAR LA PÀGINA
+     *************************************************************************/
+    function createStarfield() {
+      const container = document.getElementById('starfield');
+      const count = 75;
+      for (let i = 0; i < count; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        const size = Math.random() * 2.6 + 1;
+        star.style.width = `${size}px`;
+        star.style.height = `${size}px`;
+        star.style.left = `${Math.random() * 100}%`;
+        star.style.top = `${Math.random() * 100}%`;
+        star.style.setProperty('--duration', `${2 + Math.random() * 4}s`);
+        star.style.setProperty('--opacity', `${0.3 + Math.random() * 0.7}`);
+        container.appendChild(star);
+      }
+    }
+
+    window.onload = function () {
+      createStarfield();
+      updateHUD();
+      requestAnimationFrame(updateParticles);
+    };
+  </script>
+</body>
+</html>
